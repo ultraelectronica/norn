@@ -32,7 +32,6 @@ app/coverage/
 
 # --- Terraform ---
 infra/.terraform/
-infra/.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
 crash.log
