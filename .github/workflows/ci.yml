@@ -1,0 +1,137 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache: false # no go.sum yet (stdlib only)
+
+      - run: go vet ./...
+
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: backend
+
+      - run: go test ./...
+
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: dart analyze
+      - run: flutter test
+
+  infra:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false
+      - run: terraform validate
+
+  # Runs once scripts/bootstrap-state.sh + first apply are done and the
+  # AWS_ROLE_ARN secret is set. Fork PRs see no secrets and skip cleanly.
+  terraform-plan:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.AWS_ROLE_ARN != '' }}
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Init remote state
+        run: |
+          ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+          terraform init -input=false \
+            -backend-config="bucket=norn-tfstate-${ACCOUNT_ID}-dev" \
+            -backend-config="key=norn/dev/terraform.tfstate" \
+            -backend-config="region=us-east-1" \
+            -backend-config="dynamodb_table=norn-tflock-dev"
+
+      - run: terraform plan -input=false -var="github_repository=${{ github.repository }}"
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: [backend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        id: ecr
+        if: ${{ secrets.AWS_ROLE_ARN != '' }}
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Compute tags
+        id: tags
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          if [ "$GITHUB_REF" = "refs/heads/main" ] && [ -n "$REGISTRY" ]; then
+            echo "push=true" >> "$GITHUB_OUTPUT"
+            echo "tags=${REGISTRY}/norn/backend:main-${GITHUB_SHA},${REGISTRY}/norn/backend:latest" >> "$GITHUB_OUTPUT"
+          else
+            echo "push=false" >> "$GITHUB_OUTPUT"
+            echo "tags=norn-backend:ci" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build (and push on main)
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: ${{ steps.tags.outputs.push == 'true' }}
+          tags: ${{ steps.tags.outputs.tags }}
