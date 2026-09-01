@@ -1,0 +1,49 @@
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.iml
+
+# --- secrets / env ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Go ---
+backend/server
+/backend/bin/
+*.exe
+*.test
+*.prof
+
+# --- Flutter (app/) ---
+app/build/
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/.pub-cache/
+app/.pub/
+app/coverage/
+
+# --- Terraform ---
+infra/.terraform/
+infra/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# --- misc ---
+*.log
+graphify-out/

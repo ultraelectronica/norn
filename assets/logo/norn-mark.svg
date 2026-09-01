@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="44 40 392 400" role="img" aria-label="Norn logo mark">
+  <title>Norn</title>
+  <defs>
+    <linearGradient id="metal" x1="120" y1="380" x2="360" y2="80" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3A3D44"/>
+      <stop offset="0.60" stop-color="#55585F"/>
+      <stop offset="0.88" stop-color="#8B8E95"/>
+      <stop offset="1" stop-color="#ECEDEE"/>
+    </linearGradient>
+  </defs>
+
+  <!-- cyborg head, right-facing profile: round cranium + mechanical jaw -->
+  <g id="head">
+    <path d="M 220 72
+             A 128 128 0 0 1 340 246
+             L 384 264 L 352 284 L 384 360
+             L 348 392 L 300 392 L 180 325
+             A 128 128 0 0 1 220 72 Z"
+          fill="url(#metal)" stroke="#2A2C31" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- mechanical panel seam across the cranium -->
+    <path d="M 150 252 L 300 152" stroke="#1E2024" stroke-width="2.5"
+          stroke-linecap="round" opacity="0.38"/>
+  </g>
+
+  <!-- clock fused into the cranium = the machine's mind is time -->
+  <g id="clock" stroke="#FFFFFF" stroke-linecap="round" fill="none">
+    <!-- hour ticks at 12 / 3 / 6 / 9 -->
+    <path d="M 220 92 L 220 104" stroke-width="3"/>
+    <path d="M 328 200 L 316 200" stroke-width="3"/>
+    <path d="M 220 308 L 220 296" stroke-width="3"/>
+    <path d="M 112 200 L 124 200" stroke-width="3"/>
+    <!-- hands: hour to 10, minute to 2 -->
+    <path d="M 220 200 L 175 174" stroke-width="5"/>
+    <path d="M 220 200 L 260 131" stroke-width="4"/>
+    <circle cx="220" cy="200" r="5" fill="#FFFFFF" stroke="none"/>
+  </g>
+</svg>

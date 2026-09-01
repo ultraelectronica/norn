@@ -1,0 +1,9 @@
+# Flutter (see https://github.com/flutter/flutter/blob/master/.gitignore)
+**/build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+coverage/
