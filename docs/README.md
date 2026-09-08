@@ -8,26 +8,6 @@ as the default; everything else is opt-in per user.
 > **Status:** Planning. Architecture and tech stack are locked; implementation
 > has not started.
 
-## Why "Norn"
-
-*Norn* comes from the Norse Norns (Urðr, Verðandi, Skuld) — weavers of fate who
-govern past, present, and future. The metaphor fits an AI that holds all three
-in one mind: memory, context, and prediction. Precise, calm, intelligent,
-trustworthy, slightly mechanical — a machine whose mind is time.
-
-The visual direction is a **right-facing cyborg profile whose cranium is a
-clock** — half-organic, half-mechanical, with a subtle panel seam and
-minimalist clock hands at 10 and 2.
-
-## Brand
-
-The logo is the cyborg/clock mark — premium, sparse, cinematic.
-
-- **Palette:** gunmetal `#3A3D44` → white gradient, off-white `#ECEDEE`, charcoal `#2A2C31`
-- **Background:** transparent
-- **Format:** SVG + 1024px PNG, square safe-area that crops to a circle for app icons
-- **Generation:** rendered via the `brandkit` skill, output lands in `assets/logo/`
-
 Concept boards are produced after the plan is approved; see [PLAN.md](./PLAN.md).
 
 ## Documentation index
